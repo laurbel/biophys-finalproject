@@ -48,8 +48,8 @@ def get_restaurant_data(db_filename):
         #append this new dictionary to the list we created 
         my_list.append(my_dict)
     return my_list
-
-#get_restaurant_data('South_U_Restaurants.db')
+#running first function
+get_restaurant_data('South_U_Restaurants.db')
 
 
 def charts_restaurant_categories(db_filename):
@@ -80,7 +80,7 @@ def charts_restaurant_categories(db_filename):
     
     return my_dict
 
-#charts_restaurant_categories('South_U_Restaurants.db')
+charts_restaurant_categories('South_U_Restaurants.db')
 
 
 #all functions in this section come from function_storage file 
@@ -93,8 +93,8 @@ print(top(restaurant_data_df, n=6))
 
 grouped = restaurant_data_df.groupby(["name"])
 #can apply the function instead of calling on it... 
-#print(get_stats(restaurant_data_df[['building' ,'rating']]),
-#grouped.apply(get_wavg))
+print(get_stats(restaurant_data_df[['building' ,'rating']]),
+grouped.apply(get_wavg))
 
 restaurant_data_dfTwo = restaurant_data_df.copy()
 

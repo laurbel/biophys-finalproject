@@ -35,3 +35,37 @@ def AutoRegModel(data, lags=int):
     model = AutoReg(list(data['rating']), MAXLAGS)
     results = model.fit()
     return results.summary()
+
+
+
+
+
+
+
+
+class helperset:
+    def __init__(self, data):
+        self.data = data
+        self.min = np.min(self.data)
+        self.max = np.max(self.data)
+        self.count = np.count_nonzero(self.data)
+        self.mean = np.mean(self.data)
+
+
+    def get_wavg(self, groupdf):
+        self.group =  self.data.groupby(level=0)
+        self.avg = np.average(groupdf["building"], weights=groupdf["rating"])
+        return self.avg
+
+    
+    def get_stats(self, groupdf):
+        
+        se = pd.DataFrame({"min": groupdf.min(), "max": groupdf.max(),
+        "count": groupdf.count(), "mean": groupdf.mean()})
+        return se
+    
+      
+    def top(self, n=5, column="rating"):
+        return self.data.sort_values(column, ascending=False)[:n]
+            
+      

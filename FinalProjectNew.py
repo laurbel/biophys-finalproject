@@ -6,13 +6,17 @@ import unittest
 import pandas as pd
 from statsmodels.tsa.ar_model import AutoReg
 
+import seaborn as sns
+
 from sklearn.preprocessing import OrdinalEncoder
 
 enc = OrdinalEncoder()
 import numpy as np
 from pathlib import Path
 
-from function_storage import top, get_stats, AutoRegModel, get_wavg
+from function_storage import AutoRegModel
+#from function_storage import top, get_stats, AutoRegModel, get_wavg
+from function_storage import helperset
 
 
 
@@ -49,7 +53,7 @@ def get_restaurant_data(db_filename):
         my_list.append(my_dict)
     return my_list
 #running first function
-get_restaurant_data('South_U_Restaurants.db')
+#get_restaurant_data('South_U_Restaurants.db')
 
 
 def charts_restaurant_categories(db_filename):
@@ -80,21 +84,15 @@ def charts_restaurant_categories(db_filename):
     
     return my_dict
 
-charts_restaurant_categories('South_U_Restaurants.db')
+#charts_restaurant_categories('South_U_Restaurants.db')
 
 
 #all functions in this section come from function_storage file 
 #helping modularize the project
 
 
+
 restaurant_data_df = pd.DataFrame(get_restaurant_data("South_U_Restaurants.db"))
-print(top(restaurant_data_df, n=6))
-
-
-grouped = restaurant_data_df.groupby(["name"])
-#can apply the function instead of calling on it... 
-print(get_stats(restaurant_data_df[['building' ,'rating']]),
-grouped.apply(get_wavg))
 
 restaurant_data_dfTwo = restaurant_data_df.copy()
 
@@ -103,6 +101,17 @@ restaurant_data_dfTwo['category_int'] = enc.fit_transform(restaurant_data_dfTwo[
 restaurant_data_dfTwo['category_int'] = restaurant_data_dfTwo['category_int'].astype(int)
 
 AutoRegModel(restaurant_data_dfTwo, 5)
+
+#UPDATE: using the helperset class and saving it as the variable data to call on
+
+data =  helperset(restaurant_data_dfTwo)  
+
+print(data.top(6))
+
+#grouped = restaurant_data_df.groupby(["name"])
+grouped = restaurant_data_dfTwo.groupby(level = 0).sum()
+#can apply the function instead of calling on it... 
+print(data.get_stats(grouped), data.get_wavg(grouped))
 
 #prints out a massive list of the data stored in the database South_U_Restaurants
 #each item in this list is a dictionary 
@@ -143,5 +152,27 @@ def threeDPlot(data):
 # show plot
         plt.show()
 
-threeDPlot(restaurant_data_dfTwo)
+#threeDPlot(restaurant_data_dfTwo)
               
+from sklearn.preprocessing import OrdinalEncoder
+def final_plots():
+    
+    enc = OrdinalEncoder()
+    restaurant_data_df['category_int'] = enc.fit_transform(restaurant_data_df[['category']])
+    restaurant_data_df['category_int'] = restaurant_data_df[['category_int']].astype(int)
+
+    sns.set_context("notebook", font_scale=1.5, rc={"lines.linewidth": 7.5})
+    sns.pairplot(data=restaurant_data_df);
+
+
+    cor = round(restaurant_data_df.corr(), 5)
+    cor
+    plt.figure(figsize=(6,5))
+    sns.heatmap(cor, annot= True, cmap=plt.cm.CMRmap_r)
+    plt.title('Heatmap for the Data Correlation')
+    plt.show()
+
+    restaurant_data_df.hvplot.scatter('category_int', "rating")
+    restaurant_data_df.hvplot.barh('category_int', "rating")
+
+final_plots()
